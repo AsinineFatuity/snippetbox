@@ -18,7 +18,8 @@ func home(w http.ResponseWriter, r *http.Request) {
 		http.NotFound(w, r)
 		return
 	}
-	ts, err := template.ParseFiles("./ui/html/home.page.tmpl")
+	filesToParse := []string{"./ui/html/home.page.tmpl", "./ui/html/base.layout.tmpl"}
+	ts, err := template.ParseFiles(filesToParse...)
 	if err != nil {
 		log.Println(err.Error())
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
