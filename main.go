@@ -10,6 +10,11 @@ const showSnippetURL string = "/snippet"
 const createSnippetURL string = "/snippet/create"
 
 func home(w http.ResponseWriter, r *http.Request) {
+	// enforce the home page to be fixed path instead of subtree path
+	if r.URL.Path != homeURL {
+		http.NotFound(w, r)
+		return
+	}
 	w.Write([]byte("Home page..."))
 }
 
