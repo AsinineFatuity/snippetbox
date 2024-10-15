@@ -11,6 +11,7 @@ import (
 const homeURL string = "/"
 const showSnippetURL string = "/snippet"
 const createSnippetURL string = "/snippet/create"
+const staticURL string = "/static/"
 
 func home(w http.ResponseWriter, r *http.Request) {
 	// enforce the home page to be fixed path instead of subtree path
