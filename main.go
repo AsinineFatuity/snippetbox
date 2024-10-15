@@ -3,6 +3,7 @@ package main
 import (
 	"log"
 	"net/http"
+	"strconv"
 )
 
 const homeURL string = "/"
@@ -19,6 +20,12 @@ func home(w http.ResponseWriter, r *http.Request) {
 }
 
 func showSnippet(w http.ResponseWriter, r *http.Request) {
+	snippetId, error := strconv.Atoi(r.URL.Query().Get("id"))
+	if error != nil || snippetId < 1 {
+		http.NotFound(w, r)
+		return
+	}
+
 	w.Write([]byte("Display a specific snippet..."))
 }
 func createSnippet(w http.ResponseWriter, r *http.Request) {
