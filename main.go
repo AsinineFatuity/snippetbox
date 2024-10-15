@@ -6,7 +6,8 @@ import (
 )
 
 func home(w http.ResponseWriter, r *http.Request) {
-	w.Write([]byte("Hello from snippet box"))
+	returnText := []byte("Hello from snippet box")
+	w.Write(returnText)
 }
 
 func main() {
