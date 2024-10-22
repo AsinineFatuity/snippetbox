@@ -15,27 +15,27 @@ const staticURL string = "/static/"
 func (app *application) home(w http.ResponseWriter, r *http.Request) {
 	// enforce the home page to be fixed path instead of subtree path
 	if r.URL.Path != homeURL {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 	filesToParse := []string{"./ui/html/home.page.tmpl", "./ui/html/base.layout.tmpl", "./ui/html/footer.partial.tmpl"}
 	ts, err := template.ParseFiles(filesToParse...)
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, err)
 		return
 	}
 	err = ts.Execute(w, nil)
 	if err != nil {
 		app.errorLog.Println(err.Error())
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		app.serverError(w, err)
 	}
 }
 
 func (app *application) showSnippet(w http.ResponseWriter, r *http.Request) {
 	snippetId, error := strconv.Atoi(r.URL.Query().Get("id"))
 	if error != nil || snippetId < 1 {
-		http.NotFound(w, r)
+		app.notFound(w)
 		return
 	}
 
@@ -46,7 +46,7 @@ func (app *application) createSnippet(w http.ResponseWriter, r *http.Request) {
 		//let client know allowed methods
 		w.Header().Set("Allow", http.MethodPost)
 		//let the client know that the method is not allowed
-		http.Error(w, "Method Not Allowed", http.StatusMethodNotAllowed)
+		app.clientError(w, http.StatusMethodNotAllowed)
 		return
 	}
 	w.Write([]byte("Create a new snippet..."))
