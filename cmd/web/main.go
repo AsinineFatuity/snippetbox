@@ -11,8 +11,10 @@ import (
 
 func main() {
 	envError := godotenv.Load()
+	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
+	errorLog := log.New(os.Stderr, "ERROR\t", log.Ldate|log.Ltime|log.Lshortfile)
 	if envError != nil {
-		log.Fatal("Error loading .env file")
+		errorLog.Fatal("Error loading .env file")
 	}
 	//define port command line flag
 	defaultPort := os.Getenv("SNIPPETBOX_ADDR")
@@ -26,7 +28,7 @@ func main() {
 	fileServer := http.FileServer(http.Dir("./ui/static/"))
 	mux.Handle(staticURL, http.StripPrefix("/static", fileServer))
 
-	log.Printf("Starting server on port %s", *addr)
+	infoLog.Printf("Starting server on port %s", *addr)
 	err := http.ListenAndServe(*addr, mux)
-	log.Fatal(err)
+	errorLog.Fatal(err)
 }
