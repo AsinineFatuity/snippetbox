@@ -9,6 +9,11 @@ import (
 	"github.com/joho/godotenv"
 )
 
+type application struct {
+	errorLog *log.Logger
+	infoLog  *log.Logger
+}
+
 func main() {
 	envError := godotenv.Load()
 	infoLog := log.New(os.Stdout, "INFO\t", log.Ldate|log.Ltime)
@@ -21,7 +26,12 @@ func main() {
 	addr := flag.String("addr", defaultPort, "HTTP network address")
 	flag.Parse() //parse the flags so they can be used
 	mux := http.NewServeMux()
-	urlHandlerMap := map[string]http.HandlerFunc{homeURL: home, showSnippetURL: showSnippet, createSnippetURL: createSnippet}
+	// define new instance of app containing the dependecies
+	app := &application{
+		errorLog: errorLog,
+		infoLog:  infoLog,
+	}
+	urlHandlerMap := map[string]http.HandlerFunc{homeURL: app.home, showSnippetURL: app.showSnippet, createSnippetURL: app.createSnippet}
 	for url, handler := range urlHandlerMap {
 		mux.HandleFunc(url, handler)
 	}
