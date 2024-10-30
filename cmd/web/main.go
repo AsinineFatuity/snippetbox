@@ -1,10 +1,13 @@
 package main
 
 import (
+	"database/sql"
 	"flag"
 	"log"
 	"net/http"
 	"os"
+
+	_ "github.com/go-sql-driver/mysql"
 
 	"github.com/joho/godotenv"
 )
@@ -25,6 +28,16 @@ func main() {
 	defaultPort := os.Getenv("SNIPPETBOX_ADDR")
 	addr := flag.String("addr", defaultPort, "HTTP network address")
 	flag.Parse() //parse the flags so they can be used
+	// define command line flag for MYSQL DSN string
+	dsn := flag.String("dsn", os.Getenv("SNIPPETBOX_DB"), "MySQL data source name")
+	flag.Parse()
+	db, err := openDB(*dsn)
+	if err != nil {
+		errorLog.Fatal(err)
+	} else {
+		infoLog.Println("Database connection successful")
+	}
+	defer db.Close()
 	// define new instance of app containing the dependecies
 	app := &application{
 		errorLog: errorLog,
@@ -37,6 +50,17 @@ func main() {
 		Handler:  app.routes(),
 	}
 	infoLog.Printf("Starting server on port %s", *addr)
-	err := srv.ListenAndServe()
+	err = srv.ListenAndServe()
 	errorLog.Fatal(err)
+}
+
+func openDB(dsn string) (*sql.DB, error) {
+	db, err := sql.Open("mysql", dsn)
+	if err != nil {
+		return nil, err
+	}
+	if err = db.Ping(); err != nil {
+		return nil, err
+	}
+	return db, nil
 }
